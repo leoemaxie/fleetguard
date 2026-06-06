@@ -1,9 +1,9 @@
-import { beforeAll, afterAll } from 'vitest';
+import { beforeAll, afterAll } from 'vitest'
 
 beforeAll(() => {
-  process.env.NODE_ENV = 'test';
-});
+  process.env.NODE_ENV = 'test'
+})
 
 afterAll(() => {
-  process.env.NODE_ENV = 'test';
-});
+  process.env.NODE_ENV = 'test'
+})

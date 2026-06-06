@@ -1,12 +1,15 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify'
 
-export async function tenantScope(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
-  request.tenantId = request.user.tenantId;
+export async function tenantScope(
+  request: FastifyRequest,
+  _reply: FastifyReply,
+): Promise<void> {
+  request.tenantId = request.user.tenantId
   request.user = {
     sub: request.user.sub,
     id: request.user.sub,
     email: request.user.email ?? '',
     role: request.user.role,
-    tenantId: request.user.tenantId
-  };
+    tenantId: request.user.tenantId,
+  }
 }

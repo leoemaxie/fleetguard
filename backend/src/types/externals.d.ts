@@ -1,2 +1,2 @@
-declare module 'bcryptjs';
-declare module 'luxon';
+declare module 'bcryptjs'
+declare module 'luxon'

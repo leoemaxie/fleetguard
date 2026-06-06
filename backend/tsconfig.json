@@ -15,7 +15,7 @@
     "declaration": true,
     "sourceMap": true,
     "outDir": "dist",
-    "types": ["node", "vitest/globals"],
+    "types": ["node", "vitest/globals"]
   },
   "include": ["src", "db", "tests", "drizzle.config.ts"],
   "exclude": ["dist", "node_modules"]

@@ -1,5 +1,8 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify'
 
-export async function authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  await request.server.authenticate(request, reply);
+export async function authenticate(
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
+  await request.server.authenticate(request, reply)
 }

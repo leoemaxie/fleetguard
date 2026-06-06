@@ -1,11 +1,11 @@
-import { sql } from 'drizzle-orm';
-import type { DrizzleClient } from '../../db/client.js';
+import { sql } from 'drizzle-orm'
+import type { DrizzleClient } from '../../db/client.js'
 
 export async function isWithinCorridor(
   db: DrizzleClient,
   lat: number,
   lon: number,
-  routeId: string
+  routeId: string,
 ): Promise<boolean> {
   const result = await db.execute<{ within: boolean }>(sql`
     SELECT ST_Within(
@@ -15,8 +15,8 @@ export async function isWithinCorridor(
     FROM routes r
     WHERE r.id = ${routeId}
     LIMIT 1
-  `);
+  `)
 
-  const row = Array.isArray(result) ? result[0] : (result as any)[0];
-  return row ? (row.within as boolean) : true;
+  const row = Array.isArray(result) ? result[0] : (result as any)[0]
+  return row ? (row.within as boolean) : true
 }

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { FleetResponseSchema } from './fleet.schema.js';
+import { describe, expect, it } from 'vitest'
+import { FleetResponseSchema } from './fleet.schema.js'
 
 describe('fleet schema', () => {
   it('validates fleet response object', () => {
@@ -11,8 +11,8 @@ describe('fleet schema', () => {
       speedKph: '32.5',
       fuelLevelPct: '80.4',
       openAlertCount: 0,
-      statusColor: 'green'
-    });
-    expect(parsed.success).toBe(true);
-  });
-});
+      statusColor: 'green',
+    })
+    expect(parsed.success).toBe(true)
+  })
+})

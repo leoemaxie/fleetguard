@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const CreateRouteSchema = z.object({
   name: z.string().min(1).max(255),
@@ -6,10 +6,10 @@ export const CreateRouteSchema = z.object({
   corridorWidthMetres: z.number().int().positive().default(500),
   originName: z.string().min(1).max(255),
   destinationName: z.string().min(1).max(255),
-  distanceKm: z.number().positive().optional()
-});
+  distanceKm: z.number().positive().optional(),
+})
 
-export const UpdateRouteSchema = CreateRouteSchema.partial();
+export const UpdateRouteSchema = CreateRouteSchema.partial()
 
 export const RouteResponseSchema = z.object({
   id: z.string().uuid(),
@@ -21,20 +21,23 @@ export const RouteResponseSchema = z.object({
   distanceKm: z.string().nullable(),
   isActive: z.boolean(),
   createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime()
-});
+  updatedAt: z.string().datetime(),
+})
 
 export const ListRoutesQuerySchema = z.object({
   cursor: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional()
-});
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+})
 
-export const RouteParams = z.object({ routeId: z.string().uuid() });
-export const StopParams = z.object({ routeId: z.string().uuid(), stopId: z.string().uuid() });
+export const RouteParams = z.object({ routeId: z.string().uuid() })
+export const StopParams = z.object({
+  routeId: z.string().uuid(),
+  stopId: z.string().uuid(),
+})
 
 export const CreateStopSchema = z.object({
   name: z.string().min(1).max(255),
   lat: z.number(),
   lon: z.number(),
-  maxDwellMinutes: z.number().int().positive().default(30)
-});
+  maxDwellMinutes: z.number().int().positive().default(30),
+})

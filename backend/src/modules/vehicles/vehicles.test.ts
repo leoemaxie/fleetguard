@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { CreateVehicleSchema } from './vehicles.schema.js';
+import { describe, expect, it } from 'vitest'
+import { CreateVehicleSchema } from './vehicles.schema.js'
 
 describe('vehicles schema', () => {
   it('validates create payload', () => {
@@ -9,8 +9,8 @@ describe('vehicles schema', () => {
       model: 'Hilux',
       year: 2021,
       fuelTankCapacityLitres: 80,
-      status: 'active'
-    });
-    expect(parsed.success).toBe(true);
-  });
-});
+      status: 'active',
+    })
+    expect(parsed.success).toBe(true)
+  })
+})
