@@ -3,7 +3,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { sql } from 'drizzle-orm';
 
 const rlsPlugin: FastifyPluginAsync = async (app) => {
-  app.addHook('beforeHandler', async (request) => {
+  app.addHook('preHandler', async (request) => {
     if (!request.user?.tenantId) {
       return;
     }

@@ -130,7 +130,7 @@ export async function startAlertWorker(signal: AbortSignal): Promise<void> {
             })
             .returning();
 
-          await redis.set(dedupKey, created.id, 'EX', 300);
+          await redis.set(dedupKey, created!.id, 'EX', 300);
 
           if (candidate.severity === 'critical') {
             await redis.publish(`${ALERT_CHANNEL_PREFIX}:${payload.tenantId}`, JSON.stringify(created));

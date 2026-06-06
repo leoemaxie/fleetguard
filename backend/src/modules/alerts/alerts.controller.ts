@@ -56,7 +56,7 @@ export async function getAlertController(request: FastifyRequest<{ Params: Param
 }
 
 export async function resolveAlertController(request: FastifyRequest<{ Params: Params }>, reply: FastifyReply): Promise<void> {
-  const alert = await resolveAlert(request.server, request.tenantId, request.params.alertId, request.user.id);
+  const alert = await resolveAlert(request.server, request.tenantId, request.params.alertId, request.user.id!);
   void reply.send(mapAlert(alert));
 }
 
@@ -64,7 +64,7 @@ export async function bulkResolveController(
   request: FastifyRequest<{ Body: { ids: string[] } }>,
   reply: FastifyReply
 ): Promise<void> {
-  const rows = await bulkResolve(request.server, request.tenantId, request.body.ids, request.user.id);
+  const rows = await bulkResolve(request.server, request.tenantId, request.body.ids, request.user.id!);
   void reply.send(rows.map(mapAlert));
 }
 

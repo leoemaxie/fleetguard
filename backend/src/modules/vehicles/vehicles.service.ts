@@ -38,7 +38,12 @@ export async function listVehicles(
 
 export async function createVehicle(app: FastifyInstance, tenantId: string, payload: CreateVehicleInput) {
   try {
-    const [vehicle] = await app.db.insert(vehicles).values({ ...payload, tenantId }).returning();
+    const insertPayload: Record<string, unknown> = { ...payload, tenantId };
+    if (typeof payload.fuelTankCapacityLitres === 'number') {
+      insertPayload.fuelTankCapacityLitres = payload.fuelTankCapacityLitres.toFixed(2);
+    }
+
+    const [vehicle] = await app.db.insert(vehicles).values(insertPayload as any).returning();
     if (!vehicle) {
       throw new AppError(ErrorCode.INTERNAL_ERROR, 'Failed to create vehicle', 500);
     }
@@ -69,9 +74,14 @@ export async function getVehicle(app: FastifyInstance, tenantId: string, vehicle
 
 export async function updateVehicle(app: FastifyInstance, tenantId: string, vehicleId: string, payload: UpdateVehicleInput) {
   try {
+    const setPayload: Record<string, unknown> = { ...payload };
+    if (typeof payload.fuelTankCapacityLitres === 'number') {
+      setPayload.fuelTankCapacityLitres = payload.fuelTankCapacityLitres.toFixed(2);
+    }
+
     const [vehicle] = await app.db
       .update(vehicles)
-      .set(payload)
+      .set(setPayload as any)
       .where(and(eq(vehicles.id, vehicleId), eq(vehicles.tenantId, tenantId)))
       .returning();
     if (!vehicle) {

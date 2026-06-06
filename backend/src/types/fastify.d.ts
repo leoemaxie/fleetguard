@@ -10,13 +10,15 @@ declare module '@fastify/jwt' {
       sub: string;
       tenantId: string;
       role: Role;
-      email?: string;
+      id?: string | undefined;
+      email?: string | undefined;
     };
     user: {
       sub: string;
       tenantId: string;
       role: Role;
-      email?: string;
+      id: string;
+      email?: string | undefined;
     };
   }
 }
@@ -25,8 +27,9 @@ declare module 'fastify' {
   interface FastifyRequest {
     tenantId: string;
     user: {
-      id: string;
-      email: string;
+      sub?: string | undefined;
+      id?: string | undefined;
+      email?: string | undefined;
       role: Role;
       tenantId: string;
     };

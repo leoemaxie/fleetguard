@@ -17,6 +17,6 @@ export async function isWithinCorridor(
     LIMIT 1
   `);
 
-  const row = result.rows[0];
-  return row ? row.within : true;
+  const row = Array.isArray(result) ? result[0] : (result as any)[0];
+  return row ? (row.within as boolean) : true;
 }

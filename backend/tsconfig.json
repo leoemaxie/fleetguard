@@ -7,8 +7,8 @@
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": true,
     "useUnknownInCatchVariables": true,
+    "exactOptionalPropertyTypes": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -16,8 +16,6 @@
     "sourceMap": true,
     "outDir": "dist",
     "types": ["node", "vitest/globals"],
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0"
   },
   "include": ["src", "db", "tests", "drizzle.config.ts"],
   "exclude": ["dist", "node_modules"]

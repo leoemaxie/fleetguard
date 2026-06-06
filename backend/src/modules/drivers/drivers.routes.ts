@@ -28,25 +28,24 @@ const driversRoutes: FastifyPluginAsync = async (app) => {
     '/',
     {
       schema: {
-        querystring: ListDriversQuerySchema,
-        response: {
-          200: z.object({ data: z.array(DriverResponseSchema), nextCursor: z.string().nullable(), hasMore: z.boolean() })
-        }
+        // cast zod schemas to any to satisfy Fastify's RouteHandlerMethod typing
+        querystring: ListDriversQuerySchema as any,
+        response: { 200: z.object({ data: z.array(DriverResponseSchema), nextCursor: z.string().nullable(), hasMore: z.boolean() }) as any }
       }
     },
     listDriversController
   );
 
-  app.post('/', { schema: { body: CreateDriverSchema, response: { 201: DriverResponseSchema } } }, createDriverController);
-  app.get('/:driverId', { schema: { params: DriverParams, response: { 200: DriverResponseSchema } } }, getDriverController);
-  app.patch('/:driverId', { schema: { params: DriverParams, body: UpdateDriverSchema, response: { 200: DriverResponseSchema } } }, updateDriverController);
+  app.post('/', { schema: { body: CreateDriverSchema as any, response: { 201: DriverResponseSchema as any } } }, createDriverController);
+  app.get('/:driverId', { schema: { params: DriverParams as any, response: { 200: DriverResponseSchema as any } } }, getDriverController);
+  app.patch('/:driverId', { schema: { params: DriverParams as any, body: UpdateDriverSchema as any, response: { 200: DriverResponseSchema as any } } }, updateDriverController);
 
-  app.get('/:driverId/score', { schema: { params: DriverParams } }, driverScoreController);
-  app.get('/:driverId/score/history', { schema: { params: DriverParams } }, driverScoreHistoryController);
+  app.get('/:driverId/score', { schema: { params: DriverParams as any } }, driverScoreController);
+  app.get('/:driverId/score/history', { schema: { params: DriverParams as any } }, driverScoreHistoryController);
   app.post(
     '/:driverId/score/compute',
-    { preHandler: [requireRole(['fleet_manager', 'super_admin'])], schema: { params: DriverParams } },
-    computeDriverScoreController
+    { preHandler: [requireRole(['fleet_manager', 'super_admin'])], schema: { params: DriverParams as any } },
+    computeDriverScoreController as any
   );
 };
 

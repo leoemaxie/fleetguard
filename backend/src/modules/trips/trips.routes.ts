@@ -19,7 +19,7 @@ const tripsRoutes: FastifyPluginAsync = async (app) => {
 
   app.get('/:tripId', { schema: { params: TripParams, response: { 200: TripResponseSchema } } }, getTripController);
   app.get('/:tripId/replay', { schema: { params: TripParams } }, replayTripController);
-  app.post('/:tripId/close', { preHandler: requireRole(['fleet_manager', 'super_admin']), schema: { params: TripParams } }, closeTripController);
+  app.post<{ Params: { tripId: string } }>('/:tripId/close', { preHandler: requireRole(['fleet_manager', 'super_admin']), schema: { params: TripParams } }, closeTripController);
 };
 
 export default tripsRoutes;

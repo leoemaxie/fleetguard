@@ -26,38 +26,38 @@ const vehiclesRoutes: FastifyPluginAsync = async (app) => {
   app.get(
     '/',
     {
-      schema: {
+      schema: ({
         querystring: ListVehiclesQuerySchema,
         response: {
           200: z.object({ data: z.array(VehicleResponseSchema), nextCursor: z.string().nullable(), hasMore: z.boolean() })
         }
-      }
+      } as unknown) as any
     },
-    listVehiclesController
+    listVehiclesController as any
   );
 
   app.post(
     '/',
     {
       preHandler: [requireRole(['fleet_manager', 'super_admin'])],
-      schema: { body: CreateVehicleSchema, response: { 201: VehicleResponseSchema } }
+      schema: ({ body: CreateVehicleSchema, response: { 201: VehicleResponseSchema } } as unknown) as any
     },
-    createVehicleController
+    createVehicleController as any
   );
 
-  app.get('/:vehicleId', { schema: { params: VehicleParams, response: { 200: VehicleResponseSchema } } }, getVehicleController);
+  app.get('/:vehicleId', { schema: ({ params: VehicleParams, response: { 200: VehicleResponseSchema } } as unknown) as any }, getVehicleController as any);
 
   app.patch(
     '/:vehicleId',
     {
       preHandler: [requireRole(['fleet_manager', 'super_admin'])],
-      schema: { params: VehicleParams, body: UpdateVehicleSchema, response: { 200: VehicleResponseSchema } }
+      schema: ({ params: VehicleParams, body: UpdateVehicleSchema, response: { 200: VehicleResponseSchema } } as unknown) as any
     },
-    updateVehicleController
+    updateVehicleController as any
   );
 
-  app.delete('/:vehicleId', { preHandler: [requireRole(['fleet_manager', 'super_admin'])], schema: { params: VehicleParams } }, deleteVehicleController);
-  app.get('/:vehicleId/live', { schema: { params: VehicleParams } }, liveVehicleController);
+  app.delete('/:vehicleId', { preHandler: [requireRole(['fleet_manager', 'super_admin'])], schema: ({ params: VehicleParams } as unknown) as any }, deleteVehicleController as any);
+  app.get('/:vehicleId/live', { schema: ({ params: VehicleParams } as unknown) as any }, liveVehicleController as any);
 };
 
 export default vehiclesRoutes;

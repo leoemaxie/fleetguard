@@ -14,7 +14,9 @@ const tenantsRoutes: FastifyPluginAsync = async (app) => {
   app.addHook('preHandler', authenticate);
   app.addHook('preHandler', tenantScope);
 
-  app.get(
+  app.get<{
+    Querystring: z.infer<typeof ListTenantsQuerySchema>;
+  }>(
     '/',
     {
       preHandler: [requireRole(['super_admin'])],
@@ -30,7 +32,7 @@ const tenantsRoutes: FastifyPluginAsync = async (app) => {
 
   app.get('/:tenantId', { schema: { params: TenantParams, response: { 200: TenantResponseSchema } } }, getTenantController);
 
-  app.patch(
+  app.patch<{ Params: z.infer<typeof TenantParams>; Body: z.infer<typeof UpdateTenantSchema> }>(
     '/:tenantId',
     {
       preHandler: [requireRole(['super_admin', 'fleet_manager'])],
