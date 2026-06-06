@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
 import { FoundationStack } from "../lib/stacks/foundation-stack";
 import { DataStack } from "../lib/stacks/data-stack";
@@ -62,3 +61,5 @@ compute.addDependency(iot);
 cdk.Tags.of(app).add("Project", "FleetGuard");
 cdk.Tags.of(app).add("Stage", stage);
 cdk.Tags.of(app).add("ManagedBy", "CDK");
+cdk.Tags.of(app).add("aws-apn-id", "pc:8l8gcn23lmlgammd8572tk6va");
+cdk.Tags.of(app).add("event", "oneWithAI");

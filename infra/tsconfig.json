@@ -13,7 +13,8 @@
     "rootDir": "./",
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"]
   },
   "exclude": ["node_modules", "dist", "cdk.out"]
 }
