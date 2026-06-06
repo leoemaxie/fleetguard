@@ -1,0 +1,25 @@
+{
+  "name": "fleetguard-cdk",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy:all": "cdk deploy --all --require-approval never",
+    "deploy:foundation": "cdk deploy FleetGuard-Foundation --require-approval never",
+    "deploy:data": "cdk deploy FleetGuard-Data --require-approval never",
+    "deploy:iot": "cdk deploy FleetGuard-IoT --require-approval never",
+    "deploy:compute": "cdk deploy FleetGuard-Compute --require-approval never",
+    "diff": "cdk diff --all"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.140.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "aws-cdk": "^2.140.0",
+    "typescript": "^5.4.0"
+  }
+}
