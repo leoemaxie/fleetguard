@@ -1,0 +1,51 @@
+# Dependencies & Packages
+node_modules/
+jspm_packages/
+.npm/
+.yarn/
+yarn-error.log
+
+# Build & Compilation Outputs
+dist/
+build/
+.next/
+.nuxt/
+.output/
+out/
+
+# Secrets, Credentials & Local Environments
+.env
+.env.local
+.env.*.local
+.env.production
+*.pem
+*.key
+.aws/
+.gitconfig
+
+# Testing & Code Quality
+coverage/
+.nyc_output/
+*.lcov
+.eslintcache
+.prettiercache
+.jest/
+
+# IDE, Editors & OS Files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Version Control & Documentation
+.git/
+.github/
+.gitignore
+.dockerignore
+README.md
+LICENSE
