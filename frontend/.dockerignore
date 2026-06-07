@@ -1,0 +1,53 @@
+# Dependencies & Package Managers
+node_modules/
+.npm/
+.yarn/
+yarn-error.log
+pnpm-lock.yaml
+bun.lockb
+
+# TanStack Start & Nitro Build Outputs
+.output/
+.vinxi/
+.cache/
+dist/
+build/
+
+# Secrets, Credentials & Local Environments
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+.aws/
+.gitconfig
+
+# Testing & Code Quality
+coverage/
+.nyc_output/
+*.lcov
+.eslintcache
+.prettiercache
+.playwright/
+test-results/
+
+# IDE, Editors & OS System Files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Version Control & Metadata
+.git/
+.github/
+.gitignore
+.dockerignore
+README.md
+LICENSE
