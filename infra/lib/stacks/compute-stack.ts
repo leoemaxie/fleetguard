@@ -14,6 +14,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as ecr from "aws-cdk-lib/aws-ecr";
 import { Construct } from "constructs";
+import * as cr from "aws-cdk-lib/custom-resources";
 
 interface ComputeStackProps extends cdk.StackProps {
   stage: string;
@@ -26,6 +27,7 @@ interface ComputeStackProps extends cdk.StackProps {
   alertQueue: sqs.Queue;
   rawLogsBucket: s3.Bucket;
   firmwareBucket: s3.Bucket;
+  reportsBucket: s3.Bucket;
 }
 
 // ----------------------------------------------------------------
@@ -65,6 +67,7 @@ export class ComputeStack extends cdk.Stack {
       alertQueue,
       rawLogsBucket,
       firmwareBucket,
+      reportsBucket,
     } = props;
 
     const isProd = stage === "prod";
@@ -204,8 +207,29 @@ export class ComputeStack extends cdk.Stack {
     };
 
     // ----------------------------------------------------------------
-    // Common environment variables injected into all services
+    // Common environment variables and secrets injected into all services
     // ----------------------------------------------------------------
+    const iotEndpointSdk = new cr.AwsCustomResource(this, "IoTEndpoint", {
+      onCreate: {
+        service: "Iot",
+        action: "describeEndpoint",
+        parameters: {
+          endpointType: "iot:Data-ATS"
+        },
+        physicalResourceId: cr.PhysicalResourceId.of("IoTEndpoint")
+      },
+      policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
+        resources: cr.AwsCustomResourcePolicy.ANY_RESOURCE
+      })
+    });
+    const iotEndpointAddress = iotEndpointSdk.getResponseField("endpointAddress");
+
+    const jwtSecret = secretsmanager.Secret.fromSecretNameV2(
+      this,
+      "JwtSecret",
+      `fleetguard/${stage}/jwt-secret`
+    );
+
     const commonEnv = {
       NODE_ENV: isProd ? "production" : "development",
       STAGE: stage,
@@ -216,10 +240,14 @@ export class ComputeStack extends cdk.Stack {
       ALERT_QUEUE_URL: alertQueue.queueUrl,
       RAW_LOGS_BUCKET: rawLogsBucket.bucketName,
       FIRMWARE_BUCKET: firmwareBucket.bucketName,
+      REPORTS_BUCKET: reportsBucket.bucketName,
+      IOT_ENDPOINT: iotEndpointAddress,
     };
 
     const commonSecrets = {
       DB_SECRET: ecs.Secret.fromSecretsManager(dbSecret),
+      JWT_PRIVATE_KEY: ecs.Secret.fromSecretsManager(jwtSecret, "JWT_PRIVATE_KEY"),
+      JWT_PUBLIC_KEY: ecs.Secret.fromSecretsManager(jwtSecret, "JWT_PUBLIC_KEY"),
     };
 
     // ----------------------------------------------------------------

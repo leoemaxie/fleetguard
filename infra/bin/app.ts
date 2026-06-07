@@ -54,6 +54,7 @@ const compute = new ComputeStack(app, "FleetGuard-Compute", {
   alertQueue: iot.alertQueue,
   rawLogsBucket: iot.rawLogsBucket,
   firmwareBucket: iot.firmwareBucket,
+  reportsBucket: iot.reportsBucket,
   description: "FleetGuard ECS Fargate services, API Gateway, CloudFront",
 });
 compute.addDependency(data);
