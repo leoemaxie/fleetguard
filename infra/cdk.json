@@ -16,16 +16,10 @@
   },
   "build": "npm run build",
   "context": {
-    // Disable CLI version check noise
-    "@aws-cdk/core:enableStackNameDuplicates": true,
     "@aws-cdk/aws-iam:minimizePolicies": true,
-    // Use new-style bootstrap (CDKv2 default)
     "@aws-cdk/core:bootstrapQualifier": "hnb659fds",
-    // S3 SSL requests only
     "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": true,
-    // ECS optimisation
     "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": false,
-    // Default stage — override with: cdk deploy -c stage=staging
     "stage": "prod"
   }
 }

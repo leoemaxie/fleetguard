@@ -47,6 +47,7 @@ const compute = new ComputeStack(app, "FleetGuard-Compute", {
   stage,
   vpc: foundation.vpc,
   ecsSecurityGroup: foundation.ecsSecurityGroup,
+  albSecurityGroup: foundation.albSecurityGroup,
   dbSecret: data.dbSecret,
   redisEndpoint: data.redisEndpoint,
   telemetryQueue: iot.telemetryQueue,

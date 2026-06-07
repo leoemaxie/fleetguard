@@ -12,6 +12,7 @@ export class FoundationStack extends cdk.Stack {
   public readonly dbSecurityGroup: ec2.SecurityGroup;
   public readonly cacheSecurityGroup: ec2.SecurityGroup;
   public readonly ecsSecurityGroup: ec2.SecurityGroup;
+  public readonly albSecurityGroup: ec2.SecurityGroup;
 
   // ECR repos — one per microservice. Build + push images separately.
   public readonly repositories: Record<string, ecr.Repository>;
@@ -68,6 +69,14 @@ export class FoundationStack extends cdk.Stack {
       allowAllOutbound: true,
     });
 
+    // Internal ALB — inbound is restricted by listeners/integration wiring.
+    this.albSecurityGroup = new ec2.SecurityGroup(this, "AlbSG", {
+      vpc: this.vpc,
+      securityGroupName: `fleetguard-alb-${stage}`,
+      description: "FleetGuard internal ALB",
+      allowAllOutbound: true,
+    });
+
     // RDS — inbound from ECS only
     this.dbSecurityGroup = new ec2.SecurityGroup(this, "DbSG", {
       vpc: this.vpc,
@@ -99,6 +108,7 @@ export class FoundationStack extends cdk.Stack {
     // Images tagged by git SHA in CI. Keep last 10 images max.
     // ----------------------------------------------------------------
     const serviceNames = [
+      "frontend",
       "api-gateway",
       "telemetry-ingest",
       "alert-processing",

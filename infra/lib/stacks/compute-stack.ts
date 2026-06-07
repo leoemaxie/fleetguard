@@ -19,6 +19,7 @@ interface ComputeStackProps extends cdk.StackProps {
   stage: string;
   vpc: ec2.Vpc;
   ecsSecurityGroup: ec2.SecurityGroup;
+  albSecurityGroup: ec2.SecurityGroup;
   dbSecret: secretsmanager.ISecret;
   redisEndpoint: string;
   telemetryQueue: sqs.Queue;
@@ -57,6 +58,7 @@ export class ComputeStack extends cdk.Stack {
       stage,
       vpc,
       ecsSecurityGroup,
+      albSecurityGroup,
       dbSecret,
       redisEndpoint,
       telemetryQueue,
@@ -104,6 +106,7 @@ export class ComputeStack extends cdk.Stack {
     const alb = new elbv2.ApplicationLoadBalancer(this, "InternalAlb", {
       loadBalancerName: `fleetguard-internal-${stage}`,
       vpc,
+      securityGroup: albSecurityGroup,
       internetFacing: false, // Internal only — API Gateway is the public ingress
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
     });
@@ -218,6 +221,47 @@ export class ComputeStack extends cdk.Stack {
     const commonSecrets = {
       DB_SECRET: ecs.Secret.fromSecretsManager(dbSecret),
     };
+
+    // ----------------------------------------------------------------
+    // 0. Frontend Service
+    // TanStack Start SSR app. Use Spot for cost savings in development.
+    // ----------------------------------------------------------------
+    const frontendRole = new iam.Role(this, "FrontendTaskRole", {
+      roleName: `fleetguard-frontend-task-${stage}`,
+      assumedBy: new iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
+    });
+
+    const frontendService = createService(
+      { name: "frontend", cpu: 256, memoryMiB: 512, desiredCount: isProd ? 2 : 1, useSpot: isProd ? false : true },
+      frontendRole,
+      {
+        ...commonEnv,
+        PORT: "3000",
+        SERVICE: "frontend",
+        VITE_MAPBOX_TOKEN: "pk.eyJ1IjoibGVvZW1heGllIiwiYSI6ImNtNzVwZ3N2bzBpbnoya3EzZjNraXpobXoifQ.2h_lHk_YyXvXyXvXyXvXyX", // Placeholder or from secrets
+      },
+      {}
+    );
+
+    const frontendTargetGroup = new elbv2.ApplicationTargetGroup(this, "FrontendTG", {
+      targetGroupName: `fg-fe-${stage}`,
+      vpc,
+      port: 3000,
+      protocol: elbv2.ApplicationProtocol.HTTP,
+      targets: [frontendService],
+      healthCheck: {
+        path: "/", // SSR root path
+        interval: cdk.Duration.seconds(30),
+        healthyThresholdCount: 2,
+        unhealthyThresholdCount: 3,
+      },
+      deregistrationDelay: cdk.Duration.seconds(30),
+    });
+
+    httpListener.addTargetGroups("FrontendRule", {
+      targetGroups: [frontendTargetGroup],
+      // Catch-all: anything not matched by /api/*, /auth/*, or /ws* goes to frontend
+    });
 
     // ----------------------------------------------------------------
     // 1. API Gateway Service

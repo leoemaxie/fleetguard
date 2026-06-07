@@ -44,9 +44,9 @@ export class DataStack extends cdk.Stack {
 
     const dbParameterGroup = new rds.ParameterGroup(this, "DbParamGroup", {
       engine: rds.DatabaseClusterEngine.auroraPostgres({
-        version: rds.AuroraPostgresEngineVersion.VER_15_4,
+        version: rds.AuroraPostgresEngineVersion.VER_16_2,
       }),
-      description: "FleetGuard Aurora PostgreSQL 15 — PostGIS + TimescaleDB",
+      description: "FleetGuard Aurora PostgreSQL 16 PostGIS + TimescaleDB",
       parameters: {
         // TimescaleDB and PostGIS are loaded via shared_preload_libraries.
         // Add timescaledb here once the extension is confirmed available
@@ -60,7 +60,7 @@ export class DataStack extends cdk.Stack {
     this.dbCluster = new rds.DatabaseCluster(this, "DbCluster", {
       clusterIdentifier: `fleetguard-${stage}`,
       engine: rds.DatabaseClusterEngine.auroraPostgres({
-        version: rds.AuroraPostgresEngineVersion.VER_15_4,
+        version: rds.AuroraPostgresEngineVersion.VER_16_2,
       }),
       serverlessV2MinCapacity: 0.5,  // ~$0.06/hr at idle
       serverlessV2MaxCapacity: isProd ? 16 : 4,
