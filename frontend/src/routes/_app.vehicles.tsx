@@ -5,10 +5,28 @@ import { fetchVehicles } from "@/lib/serverFns.functions";
 import { qk } from "@/lib/queryKeys";
 import { drivers as allDrivers } from "@/lib/mockData";
 import { TopBar } from "@/components/layout/AppShell";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
+import type { Vehicle } from "@/lib/mockData";
 
 export const Route = createFileRoute("/_app/vehicles")({ component: VehiclesPage });
+
+const statusLabel: Record<Vehicle["status"], string> = {
+  active: "Active", alerting: "Alerting", offline: "Offline",
+};
+
+function statusBadgeClass(s: Vehicle["status"]) {
+  return s === "active" ? "badge-active" : s === "alerting" ? "badge-alerting" : "badge-offline";
+}
+
+function FuelBar({ pct }: { pct: number }) {
+  const color = pct > 50 ? "bg-success" : pct > 20 ? "bg-warning" : "bg-destructive";
+  return (
+    <div className="progress-bar w-16">
+      <div className={`progress-bar-fill ${color}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
 
 function VehiclesPage() {
   const fn = useServerFn(fetchVehicles);
@@ -18,74 +36,138 @@ function VehiclesPage() {
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
-      <TopBar title="Vehicles" action={
-        <button onClick={pull} className="text-muted-foreground"><RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} /></button>
-      } />
-      {pulling && <div className="h-1 bg-primary animate-pulse" />}
+      <TopBar
+        title="Vehicles"
+        action={
+          <button
+            id="vehicles-refresh"
+            onClick={pull}
+            className="h-8 px-3 rounded-lg bg-surface-2 border border-border flex items-center gap-1.5 text-xs font-display text-muted-foreground hover:text-foreground hover:bg-surface-3 transition-all"
+          >
+            <RefreshCw className={`size-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+        }
+      />
+
+      {pulling && <div className="h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 animate-pulse" />}
 
       {/* Mobile cards */}
       <div className="lg:hidden p-3 space-y-2">
-        {isLoading ? Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-20 rounded-lg bg-surface-2 animate-pulse" />
-        )) : (data ?? []).map((v) => {
-          const driver = allDrivers.find((d) => d.id === v.driverId);
-          const sColor = v.status === "active" ? "bg-success" : v.status === "alerting" ? "bg-destructive" : "bg-muted-foreground";
-          return (
-            <Link key={v.id} to="/vehicles/$vehicleId" params={{ vehicleId: v.id }} className="block p-3 min-h-14 rounded-lg bg-surface-2 border border-border">
-              <div className="flex items-center justify-between gap-2">
-                <div className="font-mono font-semibold">{v.plate}</div>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-block size-2 rounded-full ${sColor}`} />
-                  <span className="text-[10px] uppercase font-display tracking-wider text-muted-foreground">{v.status}</span>
-                  {v.alertCount > 0 && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-destructive text-destructive-foreground">{v.alertCount}</span>}
-                </div>
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">{driver?.name} · {v.model}</div>
-              <div className="mt-2 flex items-center gap-4 text-xs font-mono">
-                <span>{v.speedKph} km/h</span>
-                <span>fuel {v.fuelLevel}%</span>
-                <span className="text-muted-foreground">ping {v.lastPingMins}m</span>
-              </div>
-            </Link>
-          );
-        })}
+        {isLoading
+          ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-[88px] rounded-xl skeleton-shimmer" />
+            ))
+          : (data ?? []).map((v) => {
+              const driver = allDrivers.find((d) => d.id === v.driverId);
+              return (
+                <Link
+                  key={v.id} to="/vehicles/$vehicleId" params={{ vehicleId: v.id }}
+                  className="card-hover block p-3.5 rounded-xl bg-surface-2 border border-border hover:border-border/80"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-mono font-bold text-sm tracking-wide`}>{v.plate}</span>
+                      <span className={`${statusBadgeClass(v.status)} text-[9px] font-display uppercase tracking-wider px-2 py-0.5 rounded-full`}>
+                        {statusLabel[v.status]}
+                      </span>
+                      {v.alertCount > 0 && (
+                        <span className="badge-alerting text-[9px] font-mono px-1.5 py-0.5 rounded-full">{v.alertCount}⚠</span>
+                      )}
+                    </div>
+                    <ArrowUpRight className="size-3.5 text-muted-foreground" />
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground">{driver?.name} · {v.model}</div>
+                  <div className="mt-2 flex items-center gap-4">
+                    <span className="font-mono text-xs">{v.speedKph} <span className="text-muted-foreground">km/h</span></span>
+                    <div className="flex items-center gap-2">
+                      <FuelBar pct={v.fuelLevel} />
+                      <span className="font-mono text-xs">{v.fuelLevel}%</span>
+                    </div>
+                    <span className="font-mono text-xs text-muted-foreground">ping {v.lastPingMins}m</span>
+                  </div>
+                </Link>
+              );
+            })}
       </div>
 
       {/* Desktop table */}
       <div className="hidden lg:block p-6">
-        <div className="rounded-xl border border-border overflow-hidden">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-display font-semibold text-lg tracking-tight">Fleet Registry</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">{data?.length ?? "—"} vehicles in fleet</p>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border overflow-hidden bg-surface-2">
           <table className="w-full text-sm">
-            <thead className="bg-surface-2">
-              <tr className="text-left text-xs uppercase font-display tracking-wider text-muted-foreground">
-                <th className="px-4 py-3">Plate</th>
-                <th className="px-4 py-3">Model</th>
-                <th className="px-4 py-3">Driver</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Speed</th>
-                <th className="px-4 py-3">Fuel</th>
-                <th className="px-4 py-3">Score</th>
-                <th className="px-4 py-3">Last Ping</th>
-                <th className="px-4 py-3">Alerts</th>
+            <thead>
+              <tr className="border-b border-border bg-surface-3">
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Plate</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Model</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Driver</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Status</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Speed</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Fuel</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Score</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Last ping</th>
+                <th className="px-5 py-3.5 text-left text-[10px] uppercase tracking-widest font-display text-muted-foreground">Alerts</th>
               </tr>
             </thead>
             <tbody>
-              {(data ?? []).map((v) => {
-                const d = allDrivers.find((x) => x.id === v.driverId);
-                const sColor = v.status === "active" ? "text-success" : v.status === "alerting" ? "text-destructive" : "text-muted-foreground";
-                return (
-                  <tr key={v.id} className="border-t border-border hover:bg-surface-2/50">
-                    <td className="px-4 py-3 font-mono"><Link to="/vehicles/$vehicleId" params={{ vehicleId: v.id }} className="hover:text-primary">{v.plate}</Link></td>
-                    <td className="px-4 py-3 text-muted-foreground">{v.model}</td>
-                    <td className="px-4 py-3">{d?.name}</td>
-                    <td className={`px-4 py-3 font-display uppercase text-xs ${sColor}`}>{v.status}</td>
-                    <td className="px-4 py-3 font-mono">{v.speedKph}</td>
-                    <td className="px-4 py-3 font-mono">{v.fuelLevel}%</td>
-                    <td className="px-4 py-3 font-mono">{v.fuelScore}</td>
-                    <td className="px-4 py-3 font-mono text-muted-foreground">{v.lastPingMins}m</td>
-                    <td className="px-4 py-3"><span className={`font-mono ${v.alertCount > 0 ? "text-destructive" : "text-muted-foreground"}`}>{v.alertCount}</span></td>
-                  </tr>
-                );
-              })}
+              {isLoading
+                ? Array.from({ length: 8 }).map((_, i) => (
+                    <tr key={i} className="border-t border-border">
+                      {Array.from({ length: 9 }).map((_, j) => (
+                        <td key={j} className="px-5 py-3.5">
+                          <div className="h-4 rounded skeleton-shimmer" style={{ width: `${60 + Math.random() * 40}%` }} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                : (data ?? []).map((v) => {
+                    const d = allDrivers.find((x) => x.id === v.driverId);
+                    return (
+                      <tr key={v.id} className="table-row border-t border-border transition-colors">
+                        <td className="px-5 py-3.5">
+                          <Link
+                            to="/vehicles/$vehicleId" params={{ vehicleId: v.id }}
+                            className="font-mono font-semibold text-sm hover:text-primary transition-colors flex items-center gap-1.5 group"
+                          >
+                            {v.plate}
+                            <ArrowUpRight className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </Link>
+                        </td>
+                        <td className="px-5 py-3.5 text-muted-foreground text-xs">{v.model}</td>
+                        <td className="px-5 py-3.5 text-sm">{d?.name}</td>
+                        <td className="px-5 py-3.5">
+                          <span className={`${statusBadgeClass(v.status)} text-[10px] font-display uppercase tracking-wider px-2.5 py-1 rounded-full`}>
+                            {statusLabel[v.status]}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 font-mono text-sm">{v.speedKph} <span className="text-muted-foreground text-xs">km/h</span></td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <FuelBar pct={v.fuelLevel} />
+                            <span className="font-mono text-xs">{v.fuelLevel}%</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span className={`font-mono text-sm font-semibold ${v.fuelScore >= 80 ? "text-success" : v.fuelScore >= 60 ? "text-warning" : "text-destructive"}`}>
+                            {v.fuelScore}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 font-mono text-xs text-muted-foreground">{v.lastPingMins}m ago</td>
+                        <td className="px-5 py-3.5">
+                          {v.alertCount > 0 ? (
+                            <span className="badge-alerting text-[10px] font-mono px-2 py-0.5 rounded-full">{v.alertCount}</span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground font-mono">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
             </tbody>
           </table>
         </div>

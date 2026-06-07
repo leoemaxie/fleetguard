@@ -9,10 +9,12 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -47,55 +49,190 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.205 0.04 265);    /* #0F172A */
-  --foreground: oklch(0.97 0.005 250);
-  --surface: oklch(0.205 0.04 265);
-  --surface-2: oklch(0.27 0.04 260);       /* #1E293B */
-  --card: oklch(0.27 0.04 260);
-  --card-foreground: oklch(0.97 0.005 250);
-  --popover: oklch(0.27 0.04 260);
-  --popover-foreground: oklch(0.97 0.005 250);
-  --primary: oklch(0.79 0.17 75);          /* amber #F59E0B */
-  --primary-foreground: oklch(0.2 0.04 265);
-  --secondary: oklch(0.34 0.04 260);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(0.32 0.035 260);
-  --muted-foreground: oklch(0.72 0.03 255);
+  --radius: 0.75rem;
+
+  /* Core backgrounds - deep navy-slate */
+  --background: oklch(0.13 0.025 260);
+  --foreground: oklch(0.96 0.006 250);
+  --surface: oklch(0.13 0.025 260);
+  --surface-2: oklch(0.18 0.028 258);
+  --surface-3: oklch(0.22 0.03 256);
+
+  --card: oklch(0.18 0.028 258);
+  --card-foreground: oklch(0.96 0.006 250);
+  --popover: oklch(0.18 0.028 258);
+  --popover-foreground: oklch(0.96 0.006 250);
+
+  /* Amber primary */
+  --primary: oklch(0.79 0.17 75);
+  --primary-foreground: oklch(0.14 0.025 265);
+
+  --secondary: oklch(0.26 0.032 258);
+  --secondary-foreground: oklch(0.96 0.006 250);
+
+  --muted: oklch(0.24 0.03 258);
+  --muted-foreground: oklch(0.63 0.025 255);
+
   --accent: oklch(0.79 0.17 75);
-  --accent-foreground: oklch(0.2 0.04 265);
-  --destructive: oklch(0.65 0.22 25);      /* #EF4444 */
+  --accent-foreground: oklch(0.14 0.025 265);
+
+  --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.72 0.17 160);         /* #10B981 */
-  --warning: oklch(0.74 0.18 50);          /* #F97316 */
-  --danger: oklch(0.65 0.22 25);
-  --border: oklch(0.34 0.035 260);
-  --input: oklch(0.34 0.035 260);
+
+  --success: oklch(0.70 0.17 160);
+  --warning: oklch(0.74 0.18 60);
+  --danger: oklch(0.62 0.22 25);
+
+  --border: oklch(0.26 0.028 258);
+  --input: oklch(0.22 0.028 258);
   --ring: oklch(0.79 0.17 75);
-  --sidebar: oklch(0.18 0.04 265);
-  --sidebar-foreground: oklch(0.97 0.005 250);
+
+  /* Sidebar - slightly darker than base */
+  --sidebar: oklch(0.11 0.022 262);
+  --sidebar-foreground: oklch(0.92 0.008 252);
   --sidebar-primary: oklch(0.79 0.17 75);
-  --sidebar-primary-foreground: oklch(0.2 0.04 265);
-  --sidebar-accent: oklch(0.27 0.04 260);
-  --sidebar-accent-foreground: oklch(0.97 0.005 250);
-  --sidebar-border: oklch(0.27 0.04 260);
+  --sidebar-primary-foreground: oklch(0.14 0.025 265);
+  --sidebar-accent: oklch(0.20 0.028 258);
+  --sidebar-accent-foreground: oklch(0.92 0.008 252);
+  --sidebar-border: oklch(0.20 0.025 260);
   --sidebar-ring: oklch(0.79 0.17 75);
 }
 
 .dark {
-  --background: oklch(0.205 0.04 265);
-  --foreground: oklch(0.97 0.005 250);
+  --background: oklch(0.13 0.025 260);
+  --foreground: oklch(0.96 0.006 250);
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * { border-color: var(--color-border); box-sizing: border-box; }
   html, body { background-color: var(--color-background); color: var(--color-foreground); }
   body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
-  h1, h2, h3, h4, h5 { font-family: var(--font-display); letter-spacing: -0.01em; }
+  h1, h2, h3, h4, h5 { font-family: var(--font-display); letter-spacing: -0.015em; }
   .font-mono, code, kbd, samp { font-family: var(--font-mono); }
 }
 
+/* ── Utilities ── */
 @utility safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
 @utility safe-top { padding-top: max(env(safe-area-inset-top), 0.5rem); }
 @utility no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Premium glass card ── */
+@utility glass {
+  background: oklch(0.18 0.028 258 / 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid oklch(0.32 0.03 256 / 0.6);
+}
+
+/* ── Gradient text ── */
+@utility gradient-text {
+  background: linear-gradient(135deg, oklch(0.86 0.17 75), oklch(0.72 0.15 50));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glow effects ── */
+@utility glow-primary {
+  box-shadow: 0 0 20px oklch(0.79 0.17 75 / 0.25), 0 0 40px oklch(0.79 0.17 75 / 0.1);
+}
+@utility glow-destructive {
+  box-shadow: 0 0 20px oklch(0.62 0.22 25 / 0.3);
+}
+
+/* ── Status dots ── */
+@utility dot-active { background: var(--color-success); box-shadow: 0 0 6px var(--color-success); }
+@utility dot-alerting { background: var(--color-destructive); box-shadow: 0 0 6px var(--color-destructive); }
+@utility dot-offline { background: var(--color-muted-foreground); }
+
+/* ── Sidebar nav active indicator ── */
+.nav-active-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--color-primary);
+  border-radius: 0 4px 4px 0;
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+
+/* ── Stat card shimmer ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Pulse ring for critical alerts ── */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* ── Table row hover ── */
+tr.table-row:hover { background: oklch(0.22 0.03 256 / 0.6); }
+
+/* ── Login page mesh gradient ── */
+.login-mesh {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, oklch(0.79 0.17 75 / 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, oklch(0.55 0.15 250 / 0.06) 0%, transparent 60%),
+    var(--color-background);
+}
+
+/* ── Topbar gradient border ── */
+.topbar-border {
+  border-bottom: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 1px 0 0 var(--color-border);
+}
+
+/* ── Card hover lift ── */
+.card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px oklch(0 0 0 / 0.3);
+}
+
+/* ── Progress bar for fuel/score ── */
+.progress-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-surface-3);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Badge variants ── */
+.badge-critical { background: oklch(0.62 0.22 25 / 0.18); color: oklch(0.75 0.2 25); border: 1px solid oklch(0.62 0.22 25 / 0.3); }
+.badge-warning  { background: oklch(0.74 0.18 60 / 0.18); color: oklch(0.80 0.16 60); border: 1px solid oklch(0.74 0.18 60 / 0.3); }
+.badge-info     { background: oklch(0.55 0.15 250 / 0.18); color: oklch(0.70 0.12 250); border: 1px solid oklch(0.55 0.15 250 / 0.3); }
+.badge-success  { background: oklch(0.70 0.17 160 / 0.18); color: oklch(0.78 0.15 160); border: 1px solid oklch(0.70 0.17 160 / 0.3); }
+.badge-active   { background: oklch(0.70 0.17 160 / 0.18); color: oklch(0.78 0.15 160); border: 1px solid oklch(0.70 0.17 160 / 0.3); }
+.badge-offline  { background: oklch(0.30 0.02 258 / 0.6);  color: oklch(0.55 0.02 258); border: 1px solid oklch(0.30 0.02 258); }
+.badge-alerting { background: oklch(0.62 0.22 25 / 0.18);  color: oklch(0.75 0.2 25); border: 1px solid oklch(0.62 0.22 25 / 0.3); }
