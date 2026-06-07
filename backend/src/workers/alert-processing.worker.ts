@@ -42,7 +42,9 @@ type AlertCandidate = {
 
 export async function startAlertWorker(signal: AbortSignal): Promise<void> {
   const sqs = new SQSClient({ region: env.AWS_REGION })
-  await redis.connect()
+  if (redis.status !== 'ready' && redis.status !== 'connecting') {
+    await redis.connect()
+  }
 
   while (!signal.aborted) {
     const messages = await receiveMessages(sqs, env.ALERT_QUEUE_URL, 10)

@@ -3,12 +3,25 @@ import { z } from 'zod'
 
 loadDotEnv()
 
+if (process.env.DB_SECRET) {
+  try {
+    const creds = JSON.parse(process.env.DB_SECRET)
+    if (creds.host && creds.username && creds.password) {
+      const dbname = creds.dbname || 'fleetguard'
+      process.env.DATABASE_URL = `postgresql://${creds.username}:${creds.password}@${creds.host}:${creds.port || 5432}/${dbname}?sslmode=require`
+    }
+  } catch (err) {
+    console.error('Failed to parse DB_SECRET:', err)
+  }
+}
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
     .default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
   STAGE: z.string().min(1).default('dev'),
+  SERVICE: z.string().optional(),
 
   DATABASE_URL: z.string().url(),
 

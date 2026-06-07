@@ -45,7 +45,9 @@ const payloadSchema = z.discriminatedUnion('kind', [
 
 export async function startTelemetryWorker(signal: AbortSignal): Promise<void> {
   const sqs = new SQSClient({ region: env.AWS_REGION })
-  await redis.connect()
+  if (redis.status !== 'ready' && redis.status !== 'connecting') {
+    await redis.connect()
+  }
 
   while (!signal.aborted) {
     const messages = await receiveMessages(sqs, env.TELEMETRY_QUEUE_URL, 10)
