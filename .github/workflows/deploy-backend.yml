@@ -1,0 +1,81 @@
+name: Deploy Backend to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Environment stage to deploy to'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - staging
+          - prod
+
+env:
+  AWS_REGION: af-south-1
+  STAGE: ${{ github.event.inputs.stage || 'prod' }}
+  ECS_CLUSTER: fleetguard-${{ github.event.inputs.stage || 'prod' }}
+
+jobs:
+  deploy:
+    name: Build and Deploy Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push images to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd backend
+          
+          echo "Building single backend Docker image..."
+          docker build --platform linux/amd64 -t fleetguard-backend .
+          
+          SERVICES=("api-gateway" "auth" "websocket" "telemetry-ingest" "alert-processing" "route-sync" "reporting")
+          
+          for SERVICE in "${SERVICES[@]}"; do
+            REPO_NAME="fleetguard/$SERVICE"
+            echo "Tagging and pushing $SERVICE to $ECR_REGISTRY/$REPO_NAME..."
+            
+            docker tag fleetguard-backend $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+            docker tag fleetguard-backend $ECR_REGISTRY/$REPO_NAME:latest
+            
+            docker push $ECR_REGISTRY/$REPO_NAME --all-tags
+          done
+
+      - name: Force ECS new deployments
+        run: |
+          SERVICES=("api-gateway" "auth" "websocket" "telemetry-ingest" "alert-processing" "route-sync" "reporting")
+          
+          for SERVICE in "${SERVICES[@]}"; do
+            ECS_SERVICE="fleetguard-${SERVICE}-${{ env.STAGE }}"
+            echo "Forcing new deployment for ECS service: $ECS_SERVICE..."
+            
+            aws ecs update-service \
+              --cluster ${{ env.ECS_CLUSTER }} \
+              --service $ECS_SERVICE \
+              --force-new-deployment \
+              --region ${{ env.AWS_REGION }} > /dev/null
+          done
