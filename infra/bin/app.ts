@@ -9,8 +9,7 @@ const app = new cdk.App();
 
 const env: cdk.Environment = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
-  // Defaults to af-south-1 (Cape Town) — closest AWS region to Nigeria with Multi-AZ RDS.
-  region: process.env.FLEETGUARD_REGION ?? "af-south-1",
+  region: process.env.FLEETGUARD_REGION ?? "eu-west-1",
 };
 
 const stage = app.node.tryGetContext("stage") ?? "prod";

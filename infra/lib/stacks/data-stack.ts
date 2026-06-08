@@ -44,7 +44,7 @@ export class DataStack extends cdk.Stack {
 
     const dbParameterGroup = new rds.ParameterGroup(this, "DbParamGroup", {
       engine: rds.DatabaseClusterEngine.auroraPostgres({
-        version: rds.AuroraPostgresEngineVersion.VER_16_2,
+        version: rds.AuroraPostgresEngineVersion.VER_16_9,
       }),
       description: "FleetGuard Aurora PostgreSQL 16 PostGIS + TimescaleDB",
       parameters: {
@@ -60,22 +60,22 @@ export class DataStack extends cdk.Stack {
     this.dbCluster = new rds.DatabaseCluster(this, "DbCluster", {
       clusterIdentifier: `fleetguard-${stage}`,
       engine: rds.DatabaseClusterEngine.auroraPostgres({
-        version: rds.AuroraPostgresEngineVersion.VER_16_2,
+        version: rds.AuroraPostgresEngineVersion.VER_16_9,
       }),
       serverlessV2MinCapacity: 0.5,  // ~$0.06/hr at idle
       serverlessV2MaxCapacity: isProd ? 16 : 4,
       writer: rds.ClusterInstance.serverlessV2("Writer", {
         publiclyAccessible: false,
-        parameterGroup: dbParameterGroup,
       }),
+      parameterGroup: dbParameterGroup,
       // Reader for analytics queries and trip replay (read-heavy).
       // Only provision in prod to save cost in staging.
       readers: isProd
         ? [
-            rds.ClusterInstance.serverlessV2("Reader", {
-              scaleWithWriter: true,
-            }),
-          ]
+          rds.ClusterInstance.serverlessV2("Reader", {
+            scaleWithWriter: true,
+          }),
+        ]
         : [],
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },

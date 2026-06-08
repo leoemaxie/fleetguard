@@ -18,7 +18,7 @@ on:
           - prod
 
 env:
-  AWS_REGION: af-south-1
+  AWS_REGION: eu-west-1
   STAGE: ${{ github.event.inputs.stage || 'prod' }}
   ECS_CLUSTER: fleetguard-${{ github.event.inputs.stage || 'prod' }}
 

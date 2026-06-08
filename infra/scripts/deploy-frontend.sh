@@ -2,7 +2,7 @@
 set -e
 
 STAGE=${1:-staging}
-REGION="af-south-1"
+REGION="eu-west-1"
 
 # Get AWS Account ID
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
