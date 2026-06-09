@@ -2,7 +2,7 @@
 
 **Fleet intelligence for Nigerian commercial operations.**
 
-FleetGuard is a multi-tenant SaaS platform that gives fleet operators real-time visibility into vehicle position, fuel consumption, and driver behavior. It detects fuel theft, route deviations, and unauthorized vehicle use — and surfaces evidence before the fuel card statement arrives.
+FleetGuard is a multi-tenant SaaS platform that provides fleet operators with real-time visibility into vehicle position, fuel consumption, and driver behavior. FleetGuard detects fuel theft, route deviations, and unauthorized vehicle use
 
 Built for the realities of Nigerian logistics: GPRS dead zones, unreliable power, informal stop patterns, and fuel prices that make a 20-litre discrepancy worth investigating.
 
@@ -18,13 +18,9 @@ A GPS and fuel sensor device (OBU) fitted to each vehicle transmits telemetry ov
 
 ```
 fleetguard/
-├── apps/
-│   ├── web/                  # TanStack Start PWA — fleet manager dashboard
-│   └── backend/              # Fastify API — REST + SQS workers
-├── infra/
-│   └── cdk/                  # AWS CDK TypeScript — all infrastructure
-├── packages/
-│   └── shared/               # Shared Zod schemas and TypeScript types
+├── frontend/                  # TanStack Start PWA — fleet manager dashboard
+├── backend/                   # Fastify — REST + SQS workers
+├── infra/                     # AWS CDK
 └── docs/
     ├── architecture.md
     ├── iot-provisioning.md
@@ -96,7 +92,7 @@ Full architecture notes: [`docs/architecture.md`](docs/architecture.md)
 
 ```bash
 # Clone and install
-git clone https://github.com/triumph-systems/fleetguard
+git clone https://github.com/leoemaxie/fleetguard
 cd fleetguard
 pnpm install          # installs all workspace packages
 
@@ -104,11 +100,11 @@ pnpm install          # installs all workspace packages
 docker compose up -d
 
 # Copy and configure env files
-cp apps/backend/.env.example apps/backend/.env
-cp apps/web/.env.example apps/web/.env
+cp backend/.env.example apps/backend/.env
+cp frontend/.env.example apps/web/.env
 
 # Run DB migrations and seed
-cd apps/backend
+cd backend
 pnpm run db:migrate
 pnpm run db:seed
 
@@ -120,7 +116,7 @@ pnpm run dev
 ### Infrastructure Deploy
 
 ```bash
-cd infra/cdk
+cd infra
 pnpm install
 pnpm run build
 
@@ -140,7 +136,7 @@ See [`infra/cdk/README.md`](infra/cdk/README.md) for cost estimates and post-dep
 
 ## Applications
 
-### `apps/web` — Dashboard
+### `frontend` — Dashboard
 
 Progressive Web App. Mobile-native first. Bottom navigation on small screens, sidebar on desktop. Installable as a home screen app.
 
@@ -151,7 +147,7 @@ Progressive Web App. Mobile-native first. Bottom navigation on small screens, si
 
 See [`apps/web/README.md`](apps/web/README.md)
 
-### `apps/backend` — API + Workers
+### `backend` — API + Workers
 
 Fastify REST API and two SQS worker processes sharing the same codebase.
 
@@ -195,7 +191,7 @@ A misconfigured query returns zero rows rather than leaking cross-tenant data.
 ## Contributing
 
 1. Branch from `main`: `git checkout -b feat/your-feature`
-2. Run `ppnpm run typecheck` and `pnpm run test` before pushing
+2. Run `pnpm run typecheck` and `pnpm run test` before pushing
 3. PRs require passing CI — type errors and failing tests block merge
 
 ---
